@@ -1,1 +1,47 @@
+name: Deploy Trading Bot to Cloud Functions
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to GCP Cloud Functions
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Functions
+        run: |
+          gcloud functions deploy trading-bot \
+            --gen2 \
+            --runtime=python312 \
+            --region=europe-west1 \
+            --source=. \
+            --entry-point=trading_bot_trigger \
+            --trigger-http \
+            --timeout=540s \
+            --memory=512MB \
+            --min-instances=0 \
+            --max-instances=1 \
+            --env-vars-file=.env.yaml \
+            --allow-unauthenticated
+
+      - name: Deployment Success
+        run: |
+          echo "✅ Deployment başarılı!"
+          echo "🔗 Function URL: https://europe-west1-${{ secrets.GCP_PROJECT_ID }}.cloudfunctions.net/trading-bot"
+```
 
