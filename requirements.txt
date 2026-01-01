@@ -1,1 +1,12 @@
 functions-framework==3.*
+
+
+pybit>=5.11.0
+python-dotenv>=1.0.0
+pandas>=2.0.3
+numpy==1.24.3
+python-dateutil==2.8.2
+pytz==2023.3
+requests==2.31.0
+pyarrow>=10.0.0 
+
