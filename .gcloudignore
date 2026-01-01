@@ -1,0 +1,28 @@
+# Git files
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local files
+.env
+trading_bot.log
+*.log
+
+# GitHub
+.github/
+README.md
