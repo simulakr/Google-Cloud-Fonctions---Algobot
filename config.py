@@ -11,12 +11,12 @@ BYBIT_API_SECRET = os.getenv("BYBIT_API_SECRET")
 SYMBOLS = ['BTCUSDT', 'ETHUSDT', "SOLUSDT",'XRPUSDT','DOGEUSDT']  # "SUIUSDT"
 INTERVAL = "15"  # (15m-'15', 1h-'60')
 
-# Percent ATR Ranges
-atr_ranges = {'SOLUSDT':  (0.36, 1.03),
-              'BTCUSDT': (0.14, 0.57),
-               'ETHUSDT':  (0.28, 0.87),
-              'DOGEUSDT':  (0.4, 1.17),
-              'XRPUSDT':  (0.3, 1.25), 
+# Percent ATR Ranges: atr.quantile(0.20 - 0.95)
+atr_ranges = {'SOLUSDT':  (0.423, 1.176), 
+              'BTCUSDT': (0.173, 0.645), 
+               'ETHUSDT':  (0.363, 0.990), 
+              'DOGEUSDT':  (0.465, 1.306), 
+              'XRPUSDT':  (0.363, 1.378),  
               }
 
 # Z: atr.quantile(0.25 - 0.75)
@@ -61,7 +61,7 @@ TP_ROUND_NUMBERS = {
 }
 
 # Risk Yönetimi
-RISK_PER_TRADE_USDT = 40.0  # Per 20 USDT risk
+RISK_PER_TRADE_USDT = 20.0  # Per 20 USDT risk
 LEVERAGE = 25  # (max 25x)
 DEFAULT_LEVERAGE = 25
 
