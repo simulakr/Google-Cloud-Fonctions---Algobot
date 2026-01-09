@@ -1,3 +1,4 @@
+
 import numpy as np
 import pandas as pd
 from config import atr_ranges,Z_INDICATOR_PARAMS, Z_RANGES
@@ -254,16 +255,46 @@ def calculate_indicators(df, symbol):
     df['pivot_go_breakdown_2x'] = False
     df['pivot_go_breakout_3x'] = False
     df['pivot_go_breakdown_3x'] = False
-    df.loc[(df['low_pivot_confirmed_2x']) & (df['low_structure_2x']=='HL') & (df['high_structure_2x']!='HH') & (df['close'] > df['high_pivot_filled_2x'] ), 'pivot_go_breakout_2x'] = True
-    df.loc[(df['high_pivot_confirmed_2x']) & (df['high_structure_2x']=='LH') & (df['low_structure_2x']!='LL') & (df['close'] < df['low_pivot_filled_2x']), 'pivot_go_breakdown_2x'] = True
-    df.loc[(df['low_pivot_confirmed_3x']) & (df['low_structure_3x']=='HL') & (df['high_structure_3x']!='HH') & (df['close'] > df['high_pivot_filled_3x'] ), 'pivot_go_breakout_3x'] = True
-    df.loc[(df['high_pivot_confirmed_3x']) & (df['high_structure_3x']=='LH') & (df['low_structure_3x']!='LL') & (df['close'] < df['low_pivot_filled_3x']), 'pivot_go_breakdown_3x'] = True
-
+    
+    df.loc[(df['low_pivot_confirmed_2x']) & 
+           (df['low_structure_2x']=='HL') & 
+           (df['high_structure_2x']!='HH') & 
+           (df['high_pivot_filled_2x'].notna()) &  
+           (df['close'] > df['high_pivot_filled_2x']) & 
+           (atr_ranges[symbol][0] < df['pct_atr']) & 
+           (df['pct_atr'] < atr_ranges[symbol][1]), 'pivot_go_breakout_2x'] = True
+    
+    df.loc[(df['high_pivot_confirmed_2x']) & 
+           (df['high_structure_2x']=='LH') & 
+           (df['low_structure_2x']!='LL') & 
+           (df['low_pivot_filled_2x'].notna()) &  
+           (df['close'] < df['low_pivot_filled_2x']) & 
+           (atr_ranges[symbol][0] < df['pct_atr']) & 
+           (df['pct_atr'] < atr_ranges[symbol][1]), 'pivot_go_breakdown_2x'] = True
+    
+    df.loc[(df['low_pivot_confirmed_3x']) & 
+           (df['low_structure_3x']=='HL') & 
+           (df['high_structure_3x']!='HH') & 
+           (df['high_pivot_filled_3x'].notna()) &  
+           (df['close'] > df['high_pivot_filled_3x']) & 
+           (atr_ranges[symbol][0] < df['pct_atr']) & 
+           (df['pct_atr'] < atr_ranges[symbol][1]), 'pivot_go_breakout_3x'] = True
+    
+    df.loc[(df['high_pivot_confirmed_3x']) & 
+           (df['high_structure_3x']=='LH') & 
+           (df['low_structure_3x']!='LL') & 
+           (df['low_pivot_filled_3x'].notna()) &  # 
+           (df['close'] < df['low_pivot_filled_3x']) & 
+           (atr_ranges[symbol][0] < df['pct_atr']) & 
+           (df['pct_atr'] < atr_ranges[symbol][1]), 'pivot_go_breakdown_3x'] = True
+    
     low_atr = atr_ranges[symbol][0]
     high_atr = atr_ranges[symbol][1]
     
+    # NaN Control long conditions
     long_conditions = [
-        (df['close'].shift(i) < df['high_pivot_filled_2x']).fillna(False) 
+        ((df['high_pivot_filled_2x'].notna()) & 
+         (df['close'].shift(i) < df['high_pivot_filled_2x'])).fillna(False) 
         for i in range(1, 11)
     ]
     long_shift_condition = pd.concat(long_conditions, axis=1).all(axis=1)
@@ -272,13 +303,17 @@ def calculate_indicators(df, symbol):
         (df['low_structure_2x'] == 'HL') & 
         long_shift_condition & 
         (df['high_structure_2x'] != 'HH') & 
+        (df['high_pivot_filled_2x'].notna()) & 
         (df['close'] > df['high_pivot_filled_2x']) & 
-        (df['pct_atr'].between(low_atr, high_atr)) & 
+        (low_atr < df['pct_atr']) & 
+        (df['pct_atr'] < high_atr) & 
         (df['pivot_go_breakout_2x'] == False)
     )
     
+    # NaN Control short conditions
     short_conditions = [
-        (df['close'].shift(i) > df['low_pivot_filled_2x']).fillna(False) 
+        ((df['low_pivot_filled_2x'].notna()) & 
+         (df['close'].shift(i) > df['low_pivot_filled_2x'])).fillna(False) 
         for i in range(1, 11)
     ]
     short_shift_condition = pd.concat(short_conditions, axis=1).all(axis=1)
@@ -287,12 +322,13 @@ def calculate_indicators(df, symbol):
         (df['low_structure_2x'] != 'LL') & 
         short_shift_condition & 
         (df['high_structure_2x'] == 'LH') & 
+        (df['low_pivot_filled_2x'].notna()) & 
         (df['close'] < df['low_pivot_filled_2x']) & 
-        (df['pct_atr'].between(low_atr, high_atr)) & 
+        (low_atr < df['pct_atr']) & 
+        (df['pct_atr'] < high_atr) & 
         (df['pivot_go_breakdown_2x'] == False)
     )
-
-
+    
     df.loc[second_long_condition,'pivot_go_breakout_2x'] = True
     df.loc[second_short_condition,'pivot_go_breakdown_2x'] = True
     
