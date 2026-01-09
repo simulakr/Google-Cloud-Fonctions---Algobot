@@ -28,7 +28,7 @@ jobs:
           gcloud functions deploy trading-bot \
             --gen2 \
             --runtime=python312 \
-            --region=europe-west1 \
+            --region=asia-southeast1 \
             --source=. \
             --entry-point=trading_bot_trigger \
             --trigger-http \
