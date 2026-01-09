@@ -43,5 +43,4 @@ jobs:
         run: |
           echo "✅ Deployment başarılı!"
           echo "🔗 Function URL: https://europe-west1-${{ secrets.GCP_PROJECT_ID }}.cloudfunctions.net/trading-bot"
-```
 
