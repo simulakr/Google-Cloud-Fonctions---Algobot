@@ -30,7 +30,6 @@ jobs:
             --runtime=python312 \
             --region=europe-west1 \
             --source=. \
-            --source=. \
             --entry-point=trading_bot_trigger \
             --trigger-http \
             --timeout=540s \
